@@ -13,7 +13,8 @@ import java.util.ArrayList;
 public class DBInterface {
 
 	private final String dbName = "test.db";
-	private final String tableSetupScript = "db/tableSetup.sql";
+	private final String testName = "C:\\Users\\puih123\\git\\RFIDSystem\\test.db";
+	private final String tableSetupScript = "C:\\Users\\puih123\\git\\RFIDSystem\\db\\tableSetup.sql";
 	private final String itemSchema = "(id, name, type, description, location)";
 	private final String locationSchema = "(id, name, description, address, lat, lon)";
 	private Connection c;
@@ -21,11 +22,7 @@ public class DBInterface {
 	public DBInterface() throws ClassNotFoundException, SQLException {
 		
 		Class.forName("org.sqlite.JDBC");
-	    c = DriverManager.getConnection("jdbc:sqlite:" + dbName);
-	    setupTables();
-	    String sql = "DROP TABLE locations";
-		Statement s = c.createStatement();
-		s.executeUpdate(sql);
+	    c = DriverManager.getConnection("jdbc:sqlite:" + testName);
 		setupTables();
 	}
 	
@@ -178,12 +175,17 @@ public class DBInterface {
 		
 		if(r.next()) {
 		
-			return new Location(r.getInt("id"),
+			Location l = new Location(r.getInt("id"),
 								r.getString("name"),
 								r.getString("description"),
 								r.getString("address"),
 								r.getString("lat"),
 								r.getString("lon"));
+			
+			l.setCurrentItems(this.getItemsByLocationID(l.getID()));
+			
+			return l;
+			
 		}
 		
 		//No result found

@@ -1,5 +1,7 @@
 package com.rfid.system;
 
+import com.google.gson.Gson;
+
 public class InventoryItem {
 
 	int itemID;
@@ -48,7 +50,10 @@ public class InventoryItem {
 		this.locationID = locationID;
 	}
 	
-	
+	public String toJSON() {
+		Gson gson = new Gson();
+		return gson.toJson(this);
+	}
 	
 	
 }

@@ -2,6 +2,8 @@ package com.rfid.system;
 
 import java.util.ArrayList;
 
+import com.google.gson.Gson;
+
 
 public class Location {
 
@@ -92,6 +94,11 @@ public class Location {
 	}
 	public void setCurrentItems(ArrayList<InventoryItem> currentItems) {
 		this.currentItems = currentItems;
+	}
+	
+	public String toJSON() {
+		Gson gson = new Gson();
+		return gson.toJson(this);
 	}
 	
 }
