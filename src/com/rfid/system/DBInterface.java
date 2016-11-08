@@ -143,6 +143,27 @@ public class DBInterface {
 		
 	}
 	
+	public ArrayList<InventoryItem> getItemsByType(String type) throws SQLException {
+		
+		String sql = String.format("SELECT * FROM items WHERE type=%s", type);
+		Statement s = c.createStatement();
+		ResultSet r = s.executeQuery(sql);
+		
+		ArrayList<InventoryItem> results = new ArrayList<InventoryItem>();
+		
+		if(r.next()) {
+		
+			results.add(new InventoryItem(r.getInt("id"),
+								r.getString("name"),
+								r.getString("type"),
+								r.getString("description"),
+								r.getInt("location")));
+		}
+		
+		return results;
+		
+	}
+	
 	//Note we may want to auto call this when fetching a location object by ID, to populate it's current items field.
 	//If not, will need to be properly documented
 	public ArrayList<InventoryItem> getItemsByLocationID(int id) throws SQLException {

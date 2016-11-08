@@ -21,6 +21,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
  
 @Path("/")
 public class CrunchifyRESTService {
@@ -58,16 +62,6 @@ public class CrunchifyRESTService {
 		// return HTTP response 200 in case of success
 		return Response.status(200).entity(crunchifyBuilder.toString()).build();
 	}
- 
-	@GET
-	@Path("/item")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getItemRestService(InputStream incomingData) {
-		InventoryItem item = new InventoryItem(1, "Eaglehorn Bow", "Bow", "Gains +1 durability per secret", 420);
- 
-		// return HTTP response 200 in case of success
-		return Response.status(200).entity(item.toJSON()).build();
-	}
 	
 	@GET
 	@Path("/item/{id}")
@@ -90,21 +84,45 @@ public class CrunchifyRESTService {
 	}
 	
 	@GET
-	@Path("/location")
+	@Path("/itemByType/{type}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getLocationRestService(InputStream incomingData) {
-		InventoryItem item = new InventoryItem(1, "Eaglehorn Bow", "Bow", "Gains +1 durability per secret", 420);
-		InventoryItem item2 = new InventoryItem(1, "Gladiator Bow", "Bow", "Immune while attacking", 360);
-		Location loc = new Location(420, "Arena", "RNG test", "123 Brode Lane", "Haha", "Hoho");
-		ArrayList<InventoryItem> i = new ArrayList<InventoryItem>();
-		i.add(item);
-		i.add(item2);
-		loc.setCurrentItems(i);
-		
- 
-		// return HTTP response 200 in case of success
-		return Response.status(200).entity(loc.toJSON()).build();
+	public Response getItemsByType(@PathParam("type") String type) {
+
+		try {
+			ArrayList<InventoryItem> items = db.getItemsByType(type);
+			if(items.size() != 0) {
+				
+				Gson gson = new Gson();
+				
+				return Response.status(200).entity(gson.toJson(items)).build();
+			}
+			else {
+				return Response.status(204).entity("No items of this type exist").build();
+			}
+		} catch (SQLException e) {
+			return Response.status(500).entity("Internal DB error").build();
+		}
+
 	}
+	
+	@POST
+    @Path("/post")
+    //@Consumes(MediaType.TEXT_XML)
+    public Response updateItemLocation(String msg) {
+        
+        
+        JsonParser parser = new JsonParser();
+        JsonObject o = parser.parse(msg).getAsJsonObject();
+        try {
+        	db.editItemLocation(Integer.parseInt(o.get("itemID").toString()), Integer.parseInt(o.get("locationID").toString()));
+
+			return Response.status(200).entity("Item updated").build();
+
+        } catch (SQLException e) {
+			return Response.status(500).entity("Internal DB error").build();
+		}
+        
+    }
 	
 	@GET
 	@Path("/location/{id}")
