@@ -146,6 +146,7 @@ public class CrunchifyRESTService {
 				return Response.status(204).entity("Item with requested ID does not exist").build();
 			}
 		} catch (SQLException e) {
+			e.printStackTrace();
 			return Response.status(500).entity("Internal DB error").build();
 		}
 

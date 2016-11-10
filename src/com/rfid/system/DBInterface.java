@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -75,13 +76,13 @@ public class DBInterface {
 	 */
 	public void addItem(InventoryItem i) throws SQLException {
 		
-		String sql = "INSERT INTO items" + itemSchema + String.format(" VALUES(%d, '%s', '%s', '%s', %d)", i.getID(),
-																									i.getName(),
-																									i.getType(),
-																									i.getDescription(),
-																									i.getLocationID());
-		Statement s = c.createStatement();
-		s.executeUpdate(sql);
+		String sql = "INSERT INTO items" + itemSchema + " VALUES(?, ?, ?, ?, ?)";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setInt(1, i.getID());
+		s.setString(2, i.getName());
+		s.setString(3, i.getName());
+		s.setInt(4, i.getLocationID());
+		s.executeUpdate();
 		
 	}
 	
@@ -92,13 +93,14 @@ public class DBInterface {
 	 */
 	public void addLocation(Location l) throws SQLException {
 		
-		String sql = "INSERT INTO locations" + locationSchema + String.format(" VALUES(%d, '%s', '%s', '%s', '%s', '%s')", l.getID(),
-																									l.getName(),
-																									l.getDescription(),
-																									l.getAddress(),
-																									l.getLat(),
-																									l.getLon());
-		Statement s = c.createStatement();
+		String sql = "INSERT INTO locations" + locationSchema + " VALUES(?, ?, ?, ?, ?, ?)";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setInt(1, l.getID());
+		s.setString(2, l.getName());
+		s.setString(3, l.getDescription());
+		s.setString(4, l.getAddress());
+		s.setString(5, l.getLat());
+		s.setString(6, l.getLon());
 		s.executeUpdate(sql);
 		
 	}
@@ -111,9 +113,11 @@ public class DBInterface {
 	 */
 	public void editItemLocation(int itemID, int locationID) throws SQLException {
 		
-		String sql = String.format("UPDATE items SET location=%d WHERE id=%d", locationID, itemID);
-		Statement s = c.createStatement();
-		s.executeUpdate(sql);
+		String sql = "UPDATE items SET location=? WHERE id=?";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setInt(1, locationID);
+		s.setInt(2, itemID);
+		s.executeUpdate();
 		
 	}
 	
@@ -127,9 +131,12 @@ public class DBInterface {
 	 */
 	public void editLocationCoordinates(int locationID, String lat, String lon) throws SQLException {
 		
-		String sql = String.format("UPDATE locations SET lat='%s', lon='%s' WHERE id=%d", lat, lon, locationID);
-		Statement s = c.createStatement();
-		s.executeUpdate(sql);
+		String sql = "UPDATE locations SET lat=?, lon=? WHERE id=?";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setString(1, lat);
+		s.setString(2, lon);
+		s.setInt(3, locationID);
+		s.executeUpdate();
 		
 	}
 	
@@ -142,9 +149,11 @@ public class DBInterface {
 	 */
 	public void editLocationAddress(int locationID, String address) throws SQLException {
 		
-		String sql = String.format("UPDATE locations SET address='%s' WHERE id=%d", address, locationID);
-		Statement s = c.createStatement();
-		s.executeUpdate(sql);
+		String sql = "UPDATE locations SET address=? WHERE id=?";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setString(1, address);
+		s.setInt(2, locationID);
+		s.executeUpdate();
 		
 	}
 	
@@ -157,9 +166,10 @@ public class DBInterface {
 	//BE CAREFUL.
 	public void deleteItem(int itemID) throws SQLException {
 		
-		String sql = String.format("DELETE FROM items WHERE id=%d", itemID);
-		Statement s = c.createStatement();
-		s.executeUpdate(sql);
+		String sql = "DELETE FROM items WHERE id=?";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setInt(1, itemID);
+		s.executeUpdate();
 		
 	}
 	
@@ -172,9 +182,10 @@ public class DBInterface {
 	//BE CAREFUL.
 	public void deleteLocation(int id) throws SQLException {
 		
-		String sql = String.format("DELETE FROM locations WHERE id=%d", id);
-		Statement s = c.createStatement();
-		s.executeUpdate(sql);
+		String sql = "DELETE FROM locations WHERE id=?";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setInt(1, id);
+		s.executeUpdate();
 		
 	}
 	
@@ -186,9 +197,10 @@ public class DBInterface {
 	 */
 	public InventoryItem getItemByID(int id) throws SQLException {
 		
-		String sql = String.format("SELECT * FROM items WHERE id=%d", id);
-		Statement s = c.createStatement();
-		ResultSet r = s.executeQuery(sql);
+		String sql = "SELECT * FROM items WHERE id=?";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setInt(1, id);
+		ResultSet r = s.executeQuery();
 		
 		if(r.next()) {
 		
@@ -212,9 +224,10 @@ public class DBInterface {
 	 */
 	public ArrayList<InventoryItem> getItemsByType(String type) throws SQLException {
 		
-		String sql = String.format("SELECT * FROM items WHERE type=%s", type);
-		Statement s = c.createStatement();
-		ResultSet r = s.executeQuery(sql);
+		String sql = "SELECT * FROM items WHERE type=?";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setString(1, type);
+		ResultSet r = s.executeQuery();
 		
 		ArrayList<InventoryItem> results = new ArrayList<InventoryItem>();
 		
@@ -241,9 +254,10 @@ public class DBInterface {
 	//If not, will need to be properly documented
 	public ArrayList<InventoryItem> getItemsByLocationID(int id) throws SQLException {
 		
-		String sql = String.format("SELECT * FROM items WHERE location=%d", id);
-		Statement s = c.createStatement();
-		ResultSet r = s.executeQuery(sql);
+		String sql = "SELECT * FROM items WHERE location=?";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setInt(1, id);
+		ResultSet r = s.executeQuery();
 		
 		ArrayList<InventoryItem> items = new ArrayList<InventoryItem>();
 		
@@ -269,9 +283,10 @@ public class DBInterface {
 	 */
 	public Location getLocationByID(int id) throws SQLException {
 		
-		String sql = String.format("SELECT * FROM locations WHERE id=%d", id);
-		Statement s = c.createStatement();
-		ResultSet r = s.executeQuery(sql);
+		String sql = "SELECT * FROM locations WHERE id=?";
+		PreparedStatement s = c.prepareStatement(sql);
+		s.setInt(1, id);
+		ResultSet r = s.executeQuery();
 		
 		if(r.next()) {
 		
