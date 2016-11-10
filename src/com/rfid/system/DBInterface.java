@@ -9,7 +9,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-
+/**
+ * 
+ * @author Charles Bergeron
+ * 
+ * This class is to be used as an interface to the RFID items/locations database, so that queries do not need to be manually written by users.
+ *
+ */
 public class DBInterface {
 
 	private final String dbName = "test.db";
@@ -51,11 +57,22 @@ public class DBInterface {
 		
 	}
 	
+	/**
+	 * Run the setup SQL file, if your db/tables do not exist yet.
+	 * Should probably be run on initialization to be safe.
+	 * @throws SQLException
+	 */
 	public void setupTables() throws SQLException {
 		Statement s = c.createStatement();
 		s.executeUpdate(fileToSQLScript(tableSetupScript));
 	}
 	
+	/**
+	 * Add an InventoryItem to the database.
+	 * This should be used when adding a newly tagged object, NOT when updating an object's location or attributes
+	 * @param i - InventoryItem to be added
+	 * @throws SQLException
+	 */
 	public void addItem(InventoryItem i) throws SQLException {
 		
 		String sql = "INSERT INTO items" + itemSchema + String.format(" VALUES(%d, '%s', '%s', '%s', %d)", i.getID(),
@@ -68,6 +85,11 @@ public class DBInterface {
 		
 	}
 	
+	/**
+	 * This should be used to add a new location to the databased, not to update an item's location, or to modify a location's attributes
+	 * @param l - Location to be added
+	 * @throws SQLException
+	 */
 	public void addLocation(Location l) throws SQLException {
 		
 		String sql = "INSERT INTO locations" + locationSchema + String.format(" VALUES(%d, '%s', '%s', '%s', '%s', '%s')", l.getID(),
@@ -81,6 +103,12 @@ public class DBInterface {
 		
 	}
 	
+	/**
+	 *  This should be used to update an item's location to where it is currently being used/stored
+	 * @param itemID - ID of the item to be changed
+	 * @param locationID - ID of the location at which the item is now located
+	 * @throws SQLException
+	 */
 	public void editItemLocation(int itemID, int locationID) throws SQLException {
 		
 		String sql = String.format("UPDATE items SET location=%d WHERE id=%d", locationID, itemID);
@@ -89,6 +117,14 @@ public class DBInterface {
 		
 	}
 	
+	/**
+	 * Updates a location's co-ordinates.
+	 * Useful for mobile locations such as work vans.
+	 * @param locationID - ID of the location to be updated
+	 * @param lat - Latitude
+	 * @param lon - Longitude
+	 * @throws SQLException
+	 */
 	public void editLocationCoordinates(int locationID, String lat, String lon) throws SQLException {
 		
 		String sql = String.format("UPDATE locations SET lat='%s', lon='%s' WHERE id=%d", lat, lon, locationID);
@@ -97,6 +133,13 @@ public class DBInterface {
 		
 	}
 	
+	/**
+	 * Updates a location's address
+	 * Useful for when a physical location moves locations, such as an office move. This could also be used for a van's current work location if desired.
+	 * @param locationID - ID of the location to be updated
+	 * @param address - New address of the location
+	 * @throws SQLException
+	 */
 	public void editLocationAddress(int locationID, String address) throws SQLException {
 		
 		String sql = String.format("UPDATE locations SET address='%s' WHERE id=%d", address, locationID);
@@ -105,6 +148,12 @@ public class DBInterface {
 		
 	}
 	
+	/**
+	 * Permanently delete an item from the database.
+	 * This should not be reflected in an external API.
+	 * @param itemID
+	 * @throws SQLException
+	 */
 	//BE CAREFUL.
 	public void deleteItem(int itemID) throws SQLException {
 		
@@ -114,6 +163,12 @@ public class DBInterface {
 		
 	}
 	
+	/**
+	 * Permanently delete a location from the database.
+	 * This should not be reflected in an external API.
+	 * @param itemID
+	 * @throws SQLException
+	 */
 	//BE CAREFUL.
 	public void deleteLocation(int id) throws SQLException {
 		
@@ -123,6 +178,12 @@ public class DBInterface {
 		
 	}
 	
+	/**
+	 * Get item by item ID
+	 * @param id - Item's ID
+	 * @return InventoryItem
+	 * @throws SQLException
+	 */
 	public InventoryItem getItemByID(int id) throws SQLException {
 		
 		String sql = String.format("SELECT * FROM items WHERE id=%d", id);
@@ -143,6 +204,12 @@ public class DBInterface {
 		
 	}
 	
+	/**
+	 * Get all items with a specified item type
+	 * @param type - Requested item type
+	 * @return - ArrayList<InventoryItem>
+	 * @throws SQLException
+	 */
 	public ArrayList<InventoryItem> getItemsByType(String type) throws SQLException {
 		
 		String sql = String.format("SELECT * FROM items WHERE type=%s", type);
@@ -163,7 +230,13 @@ public class DBInterface {
 		return results;
 		
 	}
-	
+
+	/**
+	 * Get all items with corresponding location ID
+	 * @param id - Location's ID
+	 * @return ArrayList<InventoryItem>
+	 * @throws SQLException
+	 */
 	//Note we may want to auto call this when fetching a location object by ID, to populate it's current items field.
 	//If not, will need to be properly documented
 	public ArrayList<InventoryItem> getItemsByLocationID(int id) throws SQLException {
@@ -188,6 +261,12 @@ public class DBInterface {
 		
 	}
 	
+	/**
+	 * Get location by unique ID
+	 * @param id - Location's ID
+	 * @return Location
+	 * @throws SQLException
+	 */
 	public Location getLocationByID(int id) throws SQLException {
 		
 		String sql = String.format("SELECT * FROM locations WHERE id=%d", id);
@@ -213,20 +292,5 @@ public class DBInterface {
 		return null;
 		
 	}
-	
-	/*public static void main( String args[] ) throws ClassNotFoundException, SQLException
-	  {
-		DBInterface db = new DBInterface();
-		
-		
-		
-		InventoryItem i = new InventoryItem(2, "Ball Peen Hammer", "Hammer", "Hammer, but peen", 1);
-		Location l = new Location(2, "The Moon", "Its the moon", "1 Moon lane", "latTest", "lonTest");
-		
-		db.addItem(i);
-		db.addLocation(l);
-		System.out.println("debug");
-		
-	  }*/
 	
 }

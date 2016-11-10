@@ -2,6 +2,13 @@ package com.rfid.system;
 
 import com.google.gson.Gson;
 
+/**
+ * 
+ * @author Charles Bergeron
+ * 
+ * This class maps to the items table in the database, and represents an RFID tagged item
+ *
+ */
 public class InventoryItem {
 
 	int itemID;
@@ -50,6 +57,10 @@ public class InventoryItem {
 		this.locationID = locationID;
 	}
 	
+	/**
+	 * 
+	 * @return JSON String representation of object
+	 */
 	public String toJSON() {
 		Gson gson = new Gson();
 		return gson.toJson(this);

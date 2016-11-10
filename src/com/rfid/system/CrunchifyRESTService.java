@@ -26,6 +26,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
  
+/**
+ * 
+ * @author Charles Bergeron
+ *
+ * This class represents the REST API, and exposes DB interactions with the RFID inventory management system
+ *
+ */
 @Path("/")
 public class CrunchifyRESTService {
 	
@@ -43,26 +50,11 @@ public class CrunchifyRESTService {
 		}
 	}
 	
-	@POST
-	@Path("/crunchifyService")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response crunchifyREST(InputStream incomingData) {
-		StringBuilder crunchifyBuilder = new StringBuilder();
-		try {
-			BufferedReader in = new BufferedReader(new InputStreamReader(incomingData));
-			String line = null;
-			while ((line = in.readLine()) != null) {
-				crunchifyBuilder.append(line);
-			}
-		} catch (Exception e) {
-			System.out.println("Error Parsing: - ");
-		}
-		System.out.println("Data Received: " + crunchifyBuilder.toString());
- 
-		// return HTTP response 200 in case of success
-		return Response.status(200).entity(crunchifyBuilder.toString()).build();
-	}
-	
+	/**
+	 * Handles GET requests to get items by ID
+	 * @param id - Item ID
+	 * @return Response
+	 */
 	@GET
 	@Path("/item/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -83,6 +75,11 @@ public class CrunchifyRESTService {
 
 	}
 	
+	/**
+	 * Handles GET requests to get items by item type
+	 * @param type - Requested item type
+	 * @return Response
+	 */
 	@GET
 	@Path("/itemByType/{type}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -105,6 +102,11 @@ public class CrunchifyRESTService {
 
 	}
 	
+	/**
+	 * Handles POST requests to update an item's location
+	 * @param msg - POST request message
+	 * @return Response
+	 */
 	@POST
     @Path("/post")
     //@Consumes(MediaType.TEXT_XML)
@@ -124,6 +126,11 @@ public class CrunchifyRESTService {
         
     }
 	
+	/**
+	 * Handles GET requests requesting a location by location ID
+	 * @param id - Location ID
+	 * @return Response
+	 */
 	@GET
 	@Path("/location/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -144,11 +151,16 @@ public class CrunchifyRESTService {
 
 	}
 	
+	/**
+	 * Handles GET requests to verify if system is running
+	 * @param incomingData
+	 * @return Response
+	 */
 	@GET
 	@Path("/verify")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response verifyRESTService(InputStream incomingData) {
-		String result = "CrunchifyRESTService Successfully started..";
+		String result = "REST RFID Service Successfully started..";
  
 		// return HTTP response 200 in case of success
 		return Response.status(200).entity(result).build();

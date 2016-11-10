@@ -4,7 +4,13 @@ import java.util.ArrayList;
 
 import com.google.gson.Gson;
 
-
+/**
+ * 
+ * @author Charles Bergeron
+ * 
+ * This class maps to the locations table in the database, and represents a location at which an RFID tagged item could be held
+ *
+ */
 public class Location {
 
 	int locationID;
@@ -96,6 +102,10 @@ public class Location {
 		this.currentItems = currentItems;
 	}
 	
+	/**
+	 * 
+	 * @return Json representation of the object, also includes the collection of inventory items
+	 */
 	public String toJSON() {
 		Gson gson = new Gson();
 		return gson.toJson(this);
